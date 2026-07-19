@@ -1,5 +1,16 @@
+import { status } from "elysia";
+import { authRepository } from "../repository/auth.repository";
+
 export const authService = {
-  login: ({ email, username }: { email: string; username: string }) => {
+  login: ({
+    email,
+    username,
+    password,
+  }: {
+    email: string;
+    username: string;
+    password: string;
+  }) => {
     return {
       message: "this is login service",
       data: {
@@ -9,15 +20,22 @@ export const authService = {
       },
     };
   },
-  register: ({ email, username }: { email: string, username: string }) => {
+  register: async ({
+    email,
+    username,
+    password,
+  }: {
+    email: string;
+    username: string;
+    password: string;
+  }) => {
+    const hashedPassword = await Bun.password.hash(password);
     
-    return {
-      message: "this is register service",
-      data: {
-        message: "this is the data extracted from the user request",
-        email: email,
-        username: username,
-      },
-    };
+      const response = await authRepository.handleRegister({
+        email,
+        username,
+        hashedPassword,
+      });
+    return response
   },
 };
