@@ -1,5 +1,6 @@
 import { status } from "elysia";
 import { authRepository } from "../repository/auth.repository";
+import { conflictError } from "../../../error";
 
 export const authService = {
   login: ({
@@ -29,13 +30,16 @@ export const authService = {
     username: string;
     password: string;
   }) => {
+    const existingUser = await authRepository.findUserByEmail(email);
+    if (existingUser) {
+      throw new conflictError("Email already exists");
+    }
     const hashedPassword = await Bun.password.hash(password);
-    
-      const response = await authRepository.handleRegister({
-        email,
-        username,
-        hashedPassword,
-      });
-    return response
+    const response = await authRepository.handleRegister({
+      email,
+      username,
+      hashedPassword,
+    });
+    return response;
   },
 };
