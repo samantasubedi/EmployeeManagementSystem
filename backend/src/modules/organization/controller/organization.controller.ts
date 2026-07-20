@@ -9,4 +9,19 @@ export const organizationController = {
       details: result,
     };
   },
+  edit: async (ctx: any) => {
+    const currentUserId =""
+
+    const result = await organizationService.edit({
+      organizationId: ctx.params.id,
+      currentUserId,
+      ...ctx.body,
+    });
+
+    ctx.set.status = 200;
+    return {
+      message: "organization updated successfully",
+      details: result,
+    };
+  },
 };

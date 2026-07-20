@@ -14,4 +14,17 @@ export const organizationRoute = new Elysia({ prefix: "/organization" })
   .post("/create", organizationController.create, {
     body: createOrganizationSchema,
   })
-  .patch("/", () => {});
+  .patch("/:id", organizationController.edit, {
+    params: t.Object({
+      id: t.String({ format: "uuid" }),
+    }),
+    body: t.Object({
+      name: t.Optional(t.String({ minLength: 2 })),
+      slug: t.Optional(
+        t.String({
+          minLength: 3,
+        }),
+      ),
+      description: t.Optional(t.String()),
+    }),
+  });

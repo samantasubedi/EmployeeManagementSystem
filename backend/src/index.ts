@@ -3,9 +3,20 @@ import { authRoutes } from "./modules/auth/auth.route";
 import { appError } from "./error";
 import openapi from "@elysia/openapi";
 import { organizationRoute } from "./modules/organization/organization.route";
+import { jwt } from "@elysia/jwt";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
+  .use(
+    jwt({ name: "accessJwt", secret: process.env.ACCESS_SECRET!, exp: "15m" }),
+  )
+  .use(
+    jwt({
+      name: "refreshJwt",
+      secret: process.env.REFRESH_SECRET ?? process.env.ACCESS_SECRET!,
+      exp: "15d",
+    }),
+  )
   .use(authRoutes)
   .use(organizationRoute)
   .use(openapi())

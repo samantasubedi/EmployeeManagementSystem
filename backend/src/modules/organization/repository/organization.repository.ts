@@ -25,4 +25,30 @@ export const organizationRepository = {
       where: eq(organizations.slug, slug),
     });
   },
+  findOrganizationById: (id: string) => {
+    return db.query.organizations.findFirst({
+      where: eq(organizations.id, id),
+    });
+  },
+  findOrganizationBySlugExcludingId: (slug: string, id: string) => {
+    return db.query.organizations.findFirst({
+      where: (organizationsTable, { and, eq, ne }) =>
+        and(eq(organizationsTable.slug, slug), ne(organizationsTable.id, id)),
+    });
+  },
+  updateOrganization: (
+    id: string,
+    payload: Partial<{
+      name: string;
+      slug: string;
+      description: string | null;
+    }>,
+  ) => {
+    return db
+      .update(organizations)
+      .set(payload)
+      .where(eq(organizations.id, id))
+      .returning()
+      .then((rows) => rows[0]);
+  },
 };

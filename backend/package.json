@@ -8,6 +8,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@elysia/jwt": "^1.4.2",
     "@elysia/openapi": "^1.4.15",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
