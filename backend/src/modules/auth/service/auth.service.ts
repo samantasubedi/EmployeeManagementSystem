@@ -18,7 +18,6 @@ const createAuthTokens = async (
   const payload = {
     userId: user.id,
     username: user.username,
-    email: user.email,
     role: user.role,
   };
 
@@ -37,20 +36,28 @@ export const authService = {
   login: async ({
     username,
     password,
+    accessJwt,
+    refreshJwt,
   }: {
     username: string;
     password: string;
+    accessJwt: JwtSigner,
+    refreshJwt:JwtSigner
   }) => {
-    const user = await authRepository.findUserByUsername(username);
-    if (!user) {
+    const userData = await authRepository.findUserByUsername(username);
+    if (!userData) {
       throw new unauthorizedError("invalid username or password");
     }
-    const valid = await Bun.password.verify(password, user.hashedPassword);
+    const valid = await Bun.password.verify(password, userData.hashedPassword);
 
     if (!valid) {
       throw new unauthorizedError("invalid username or password");
     }
-    return user;
+    const tokens=await createAuthTokens(userData,accessJwt,refreshJwt)
+    return {userData:userData,
+      accessToken: tokens.accessToken,
+      refreshToken:tokens.refreshToken
+    }
   },
   register: async ({
     email,
@@ -74,15 +81,15 @@ export const authService = {
       throw new conflictError("Username already exists");
     }
     const hashedPassword = await Bun.password.hash(password);
-    const response = await authRepository.handleRegister({
+    const userData = await authRepository.handleRegister({
       email,
       username,
       hashedPassword,
     });
-    const tokens = await createAuthTokens(response, accessJwt, refreshJwt);
+    const tokens = await createAuthTokens(userData, accessJwt, refreshJwt);
 
     return {
-      user: response,
+      user: userData,
       ...tokens,
     };
   },
