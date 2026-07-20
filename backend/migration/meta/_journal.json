@@ -15,6 +15,20 @@
       "when": 1784460940298,
       "tag": "0001_spicy_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784535173200,
+      "tag": "0002_superb_timeslip",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784536411006,
+      "tag": "0003_slippery_lilith",
+      "breakpoints": true
     }
   ]
 }
