@@ -7,11 +7,14 @@ export const registerSchema = t.Object({
   email: t.String({ format: "email" }),
   password: t.String({ minLength: 8 }),
 });
+export const loginSchema=t.Object({
+  username:t.String({minLength:3}),
+  password:t.String({minLength:8})
+})
 export const authRoutes = new Elysia({ prefix: "/auth" })
   .post("/register", authController.register, { body: registerSchema })
-  .post("/login", () => {
-    return "this is login route";
-  })
+  .post("/login", authController.login,{body:loginSchema}
+  )
   .post("/logout", () => {
     return "this is logout route";
   })

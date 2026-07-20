@@ -1,25 +1,28 @@
-import { status } from "elysia";
 import { authRepository } from "../repository/auth.repository";
-import { conflictError } from "../../../error";
+import {
+  conflictError,
+  notFoundError,
+  unauthorizedError,
+} from "../../../error";
 
 export const authService = {
-  login: ({
-    email,
+  login: async ({
     username,
     password,
   }: {
-    email: string;
     username: string;
     password: string;
   }) => {
-    return {
-      message: "this is login service",
-      data: {
-        message: "this is the data extracted from the user request",
-        email: email,
-        username: username,
-      },
-    };
+    const user = await authRepository.findUserByUsername(username);
+    if (!user) {
+      throw new unauthorizedError("invalid username or password");
+    }
+    const valid = await Bun.password.verify(password, user.hashedPassword);
+
+    if (!valid) {
+      throw new unauthorizedError("invalid username or password");
+    }
+    return user;
   },
   register: async ({
     email,
@@ -30,9 +33,13 @@ export const authService = {
     username: string;
     password: string;
   }) => {
-    const existingUser = await authRepository.findUserByEmail(email);
-    if (existingUser) {
+    const existingEmail = await authRepository.findUserByEmail(email);
+    const existingUsername = await authRepository.findUserByUsername(username);
+    if (existingEmail) {
       throw new conflictError("Email already exists");
+    }
+    if (existingUsername) {
+      throw new conflictError("Username already exists");
     }
     const hashedPassword = await Bun.password.hash(password);
     const response = await authRepository.handleRegister({

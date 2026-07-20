@@ -1,10 +1,11 @@
 import { Elysia } from "elysia";
 import { authRoutes } from "./modules/auth/auth.route";
 import { appError } from "./error";
+import openapi from "@elysia/openapi";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
-  .use(authRoutes).onError(({ error, set }) => {
+  .use(authRoutes).use(openapi()).onError(({ error, set }) => {
   if (error instanceof appError) {
     set.status = error.status;
 

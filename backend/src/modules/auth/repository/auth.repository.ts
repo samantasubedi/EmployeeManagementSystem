@@ -19,4 +19,8 @@ export const authRepository = {
   findUserByEmail:(email:string)=>{
 return db.query.users.findFirst({where:eq(users.email,email)})
   }
+  ,
+  findUserByUsername:(username:string)=>{
+  return db.query.users.findFirst({where:eq(users.username,username)})
+}
 };
