@@ -1,5 +1,6 @@
 import Elysia, { t } from "elysia";
-import { organizationController } from "./controller/organization.controller";
+import { organizationController } from "./organization.controller";
+import { authGuard } from "../../middleware/auth";
 
 export const createOrganizationSchema = t.Object({
   name: t.String({ minLength: 2 }),
@@ -7,14 +8,14 @@ export const createOrganizationSchema = t.Object({
     minLength: 3,
   }),
   description: t.Optional(t.String()),
-  ownerId: t.String({ format: "uuid" }),
 });
 
 export const organizationRoute = new Elysia({ prefix: "/organization" })
+  .use(authGuard)
   .post("/create", organizationController.create, {
     body: createOrganizationSchema,
   })
-  .patch("/:id", organizationController.edit, {
+  .patch("/edit", organizationController.edit, {
     params: t.Object({
       id: t.String({ format: "uuid" }),
     }),

@@ -4,6 +4,7 @@ import { authRoutes } from "./modules/auth/auth.route";
 import { appError } from "./error";
 import openapi from "@elysia/openapi";
 import { organizationRoute } from "./modules/organization/organization.route";
+import { userRoute } from "./modules/user/user.route";
 import { jwt } from "@elysia/jwt";
 
 const app = new Elysia()
@@ -20,6 +21,7 @@ const app = new Elysia()
   )
   .use(authRoutes)
   .use(organizationRoute)
+  .use(userRoute)
   .use(openapi())
 
   .onError(({ error, set }) => {

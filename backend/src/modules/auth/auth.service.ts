@@ -1,5 +1,5 @@
-import { authRepository } from "../repository/auth.repository";
-import { conflictError, unauthorizedError } from "../../../error";
+import { authRepository } from "./auth.repository";
+import { conflictError, unauthorizedError } from "../../error";
 
 type JwtSigner = {
   sign: (payload: Record<string, unknown>) => Promise<string>;
@@ -10,8 +10,13 @@ type AuthTokenSet = {
   refreshToken: string;
 };
 
-const createAuthTokens = async (
-  user: { id: string; username: string; email: string; role: string | null },
+export const createAuthTokens = async (
+  user: {
+    id: string;
+    username: string;
+    role: string | null;
+    organizationId: string | null;
+  },
   accessJwt: JwtSigner,
   refreshJwt: JwtSigner,
 ): Promise<AuthTokenSet> => {
@@ -19,6 +24,7 @@ const createAuthTokens = async (
     userId: user.id,
     username: user.username,
     role: user.role,
+    organizationId: user.organizationId,
   };
 
   const [accessToken, refreshToken] = await Promise.all([
@@ -41,8 +47,8 @@ export const authService = {
   }: {
     username: string;
     password: string;
-    accessJwt: JwtSigner,
-    refreshJwt:JwtSigner
+    accessJwt: JwtSigner;
+    refreshJwt: JwtSigner;
   }) => {
     const userData = await authRepository.findUserByUsername(username);
     if (!userData) {
@@ -53,11 +59,12 @@ export const authService = {
     if (!valid) {
       throw new unauthorizedError("invalid username or password");
     }
-    const tokens=await createAuthTokens(userData,accessJwt,refreshJwt)
-    return {userData:userData,
+    const tokens = await createAuthTokens(userData, accessJwt, refreshJwt);
+    return {
+      userData: userData,
       accessToken: tokens.accessToken,
-      refreshToken:tokens.refreshToken
-    }
+      refreshToken: tokens.refreshToken,
+    };
   },
   register: async ({
     email,

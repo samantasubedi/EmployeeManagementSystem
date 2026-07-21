@@ -12,6 +12,12 @@ export class conflictError extends appError {
   }
 }
 
+export class badRequestError extends appError {
+  constructor(message = "Bad request") {
+    super(400, message);
+  }
+}
+
 export class unauthorizedError extends appError {
   constructor(message = "Unauthorized") {
     super(401, message);

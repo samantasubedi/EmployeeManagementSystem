@@ -1,5 +1,9 @@
-import { conflictError, forbiddenError, notFoundError } from "../../../error";
-import { organizationRepository } from "../repository/organization.repository";
+import { eq } from "drizzle-orm";
+
+import { conflictError, forbiddenError, notFoundError } from "../../error";
+import { db } from "../../database/client";
+import { organizations, users } from "../../database/schema";
+import { organizationRepository } from "./organization.repository";
 
 export const organizationService = {
   create: async ({
@@ -17,16 +21,37 @@ export const organizationService = {
     if (!owner) {
       throw new notFoundError("owner not found");
     }
+    if (owner.organizationId) {
+      throw new conflictError("already enrolled in a company");
+    }
+    const ownedOrganization =
+      await organizationRepository.findOrganizationByOwnerId(ownerId);
+    if (ownedOrganization) {
+      throw new conflictError("already enrolled in a company");
+    }
     const existingOrganization =
       await organizationRepository.findOrganizationBySlug(slug);
     if (existingOrganization) {
       throw new conflictError("slug already exists");
     }
-    return organizationRepository.createOrganization({
-      name,
-      slug,
-      description,
-      ownerId,
+
+    return db.transaction(async (tx) => {
+      const [organization] = await tx
+        .insert(organizations)
+        .values({
+          name,
+          slug,
+          description,
+          ownerId,
+        })
+        .returning();
+
+      await tx
+        .update(users)
+        .set({ organizationId: organization.id })
+        .where(eq(users.id, ownerId));
+
+      return organization;
     });
   },
   edit: async ({

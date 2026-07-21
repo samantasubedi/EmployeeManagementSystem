@@ -1,4 +1,4 @@
-import { authService } from "../service/auth.service";
+import { authService } from "./auth.service";
 
 export const authController = {
   register: async (ctx: any) => {
@@ -12,12 +12,14 @@ export const authController = {
       value: result.accessToken,
       httpOnly: true,
       sameSite: "strict",
+      path: "/",
       maxAge: 60 * 15,
     });
     ctx.cookie.refreshToken.set({
       value: result.refreshToken,
       sameSite: "strict",
-      htttpOnly: true,
+      httpOnly: true,
+      path: "/",
       maxAge: 60 * 60 * 24 * 15,
     });
     return { message: "user registered successfully", details: result };
@@ -33,12 +35,14 @@ export const authController = {
       value: result.accessToken,
       httpOnly: true,
       sameSite: "strict",
+      path: "/",
       maxAge: 60 * 15,
     });
     ctx.cookie.refreshToken.set({
       value: result.refreshToken,
       sameSite: "strict",
-      htttpOnly: true,
+      httpOnly: true,
+      path: "/",
       maxAge: 60 * 60 * 24 * 15,
     });
     return { message: "log in successfull", details: result };

@@ -1,8 +1,13 @@
-import { organizationService } from "../service/organization.service";
+import { organizationService } from "./organization.service";
+import { requireAuthenticatedUser } from "../../middleware/auth";
 
 export const organizationController = {
   create: async (ctx: any) => {
-    const result = await organizationService.create(ctx.body);
+    const auth = await requireAuthenticatedUser(ctx);
+    const result = await organizationService.create({
+      ...ctx.body,
+      ownerId: auth.userId,
+    });
     ctx.set.status = 201;
     return {
       message: "organization created successfully",
@@ -10,7 +15,7 @@ export const organizationController = {
     };
   },
   edit: async (ctx: any) => {
-    const currentUserId =""
+    const currentUserId = (await requireAuthenticatedUser(ctx)).userId;
 
     const result = await organizationService.edit({
       organizationId: ctx.params.id,
