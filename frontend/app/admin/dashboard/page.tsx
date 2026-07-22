@@ -2,6 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getOrganizationUsers } from "@/lib/user";
+import { Icon } from "@iconify/react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
 
 type User = {
   id: string;
@@ -13,29 +19,45 @@ type User = {
 };
 
 export default function UsersPage() {
-  const { data, isLoading, isError, error } = useQuery({
+  const router = useRouter();
+  const query = useQuery({
     queryKey: ["organization-users"],
     queryFn: getOrganizationUsers,
   });
+  const { data, isLoading, isError, error } = query;
 
+  useEffect(() => {
+    if (isError) {
+      toast.error((error as Error).message || "Failed to fetch users");
+    }
+  }, [isError, error]);
   if (isLoading) {
     return (
-      <div className="p-6">
-        <p>Loading users...</p>
+      <div className="p-6 flex items-center justify-center gap-2 text-muted-foreground">
+        <Icon icon="line-md:loading-loop" className="text-3xl" />
+        <p className="text-3xl">Loading users...</p>
       </div>
     );
   }
-
-  if (isError) {
-    return <div className="p-6 text-red-500">{(error as Error).message}</div>;
-  }
-
   const users: User[] = data.details;
+
 
   return (
     <div className="p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Organization Users</h1>
+        <div className="flex justify-end ">
+          <Button
+            className="bg-purple-700 font-bold hover:bg-purple-600 cursor-pointer"
+            onClick={() => {
+              router.push("/admin/create-user");
+            }}
+          >
+            Create users
+          </Button>
+         
+        </div>
+        
         <p className="text-gray-500">Total Users: {users.length}</p>
       </div>
 
@@ -60,7 +82,9 @@ export default function UsersPage() {
                     {user.role ?? "Member"}
                   </span>
                 </td>
-                <td className="px-5 py-4">{user.description || "-"}</td>
+                <td className="px-5 py-4">
+                  {user.description || "no description added"}
+                </td>
               </tr>
             ))}
 

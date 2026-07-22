@@ -6,6 +6,6 @@ export const getOrganizationUsers = async () => {
   const response = await axios.get(`${backendUrl}/organization/users`, {
     withCredentials: true,
   });
-
+console.log(response.data.role)
   return response.data;
 };

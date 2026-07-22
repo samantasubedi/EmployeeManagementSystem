@@ -37,13 +37,7 @@ const userSchema = z.object({
 type UserForm = z.infer<typeof userSchema>;
 
 const Page = () => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<UserForm>({
+  const form = useForm<UserForm>({
     resolver: zodResolver(userSchema),
     defaultValues: {
       username: "",
@@ -53,6 +47,13 @@ const Page = () => {
       description: "",
     },
   });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
   const postApi = async (formData: UserForm) => {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
 
@@ -72,6 +73,7 @@ const Page = () => {
     onSuccess: (data) => {
       toast.success(data.message);
       console.log(data);
+      form.reset()
     },
     onError: (error: any) => {
       if (isAxiosError(error)) {
@@ -94,7 +96,7 @@ const Page = () => {
     <div className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <CardTitle>Create User</CardTitle>
+          <CardTitle className="font-bold text-center">Create User</CardTitle>
           <CardDescription>
             Add a new user to your organization.
           </CardDescription>
@@ -184,7 +186,10 @@ const Page = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full cursor-pointer bg-blue-900 hover:bg-blue-800"
+            >
               Create User
             </Button>
           </form>
