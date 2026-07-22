@@ -36,3 +36,5 @@ export const userRoute = new Elysia({ prefix: "/organization" })
     }),
     body: organizationUserUpdateSchema,
   });
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   

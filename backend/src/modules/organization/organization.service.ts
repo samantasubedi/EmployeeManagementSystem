@@ -48,7 +48,7 @@ export const organizationService = {
 
       await tx
         .update(users)
-        .set({ organizationId: organization.id })
+        .set({ organizationId: organization.id, role: "admin" })
         .where(eq(users.id, ownerId));
 
       return organization;

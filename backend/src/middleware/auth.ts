@@ -33,6 +33,7 @@ export const requireAuthenticatedUser = async (context: any) => {
   const { accessJwt, refreshJwt, cookie } = context;
 
   const accessToken = cookie.accessToken.value as string | undefined;
+
   if (accessToken) {
     try {
       const payload = await (accessJwt as JwtPlugin).verify(accessToken);
@@ -46,6 +47,7 @@ export const requireAuthenticatedUser = async (context: any) => {
   if (refreshToken) {
     try {
       const payload = await (refreshJwt as JwtPlugin).verify(refreshToken);
+
       if (payload) {
         const tokens = await createAuthTokens(
           {
@@ -65,6 +67,7 @@ export const requireAuthenticatedUser = async (context: any) => {
           ...refreshCookieOptions,
           value: tokens.refreshToken,
         });
+
         return payload;
       }
     } catch {}

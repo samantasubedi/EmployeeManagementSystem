@@ -1,10 +1,13 @@
 import { userService } from "./user.service";
+import { requireAuthenticatedUser } from "../../middleware/auth";
 
 export const userController = {
   listByOrganization: async (ctx: any) => {
+    const auth = await requireAuthenticatedUser(ctx);
+
     const result = await userService.getOrganizationUsers({
-      organizationId: ctx.auth.organizationId,
-      requesterId: ctx.auth.userId,
+      organizationId: auth.organizationId,
+      requesterId: auth.userId,
     });
 
     ctx.set.status = 200;
@@ -14,9 +17,11 @@ export const userController = {
     };
   },
   create: async (ctx: any) => {
+    const auth = await requireAuthenticatedUser(ctx);
+
     const result = await userService.createOrganizationUser({
-      organizationId: ctx.auth.organizationId,
-      requesterId: ctx.auth.userId,
+      organizationId: auth.organizationId,
+      requesterId: auth.userId,
       ...ctx.body,
     });
 
@@ -27,9 +32,11 @@ export const userController = {
     };
   },
   edit: async (ctx: any) => {
+    const auth = await requireAuthenticatedUser(ctx);
+
     const result = await userService.editOrganizationUser({
-      organizationId: ctx.auth.organizationId,
-      requesterId: ctx.auth.userId,
+      organizationId: auth.organizationId,
+      requesterId: auth.userId,
       userId: ctx.params.userId,
       ...ctx.body,
     });

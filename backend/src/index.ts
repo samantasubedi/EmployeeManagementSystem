@@ -6,6 +6,7 @@ import openapi from "@elysia/openapi";
 import { organizationRoute } from "./modules/organization/organization.route";
 import { userRoute } from "./modules/user/user.route";
 import { jwt } from "@elysia/jwt";
+import cors from "@elysia/cors";
 
 const app = new Elysia()
   .get("/", () => "Hello Elysia")
@@ -18,6 +19,11 @@ const app = new Elysia()
       secret: process.env.REFRESH_SECRET!,
       exp: "15d",
     }),
+  ).use(
+    cors
+    ({
+      origin: "http://localhost:3000",
+    })
   )
   .use(authRoutes)
   .use(organizationRoute)

@@ -50,7 +50,7 @@ export const authService = {
     accessJwt: JwtSigner;
     refreshJwt: JwtSigner;
   }) => {
-    const userData = await authRepository.findUserByUsername(username);
+    let userData = await authRepository.findUserByUsername(username);
     if (!userData) {
       throw new unauthorizedError("invalid username or password");
     }
@@ -59,6 +59,30 @@ export const authService = {
     if (!valid) {
       throw new unauthorizedError("invalid username or password");
     }
+
+    // Backfill legacy accounts created before owner role assignment was added.
+    if (!userData.role) {
+      const ownedOrganization = await authRepository.findOrganizationByOwnerId(
+        userData.id,
+      );
+
+      if (ownedOrganization) {
+        const updatedUser = await authRepository.updateUserRole(
+          userData.id,
+          "admin",
+        );
+
+        if (updatedUser) {
+          userData = updatedUser;
+        }
+      }
+    }
+
+    const refreshedUser = await authRepository.findUserById(userData.id);
+    if (refreshedUser) {
+      userData = refreshedUser;
+    }
+
     const tokens = await createAuthTokens(userData, accessJwt, refreshJwt);
     return {
       userData: userData,
@@ -96,7 +120,7 @@ export const authService = {
     const tokens = await createAuthTokens(userData, accessJwt, refreshJwt);
 
     return {
-      user: userData,
+      userData: userData,
       ...tokens,
     };
   },
