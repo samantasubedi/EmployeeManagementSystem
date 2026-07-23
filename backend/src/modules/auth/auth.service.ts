@@ -1,7 +1,7 @@
 import { authRepository } from "./auth.repository";
 import { conflictError, unauthorizedError } from "../../error";
 
-type JwtSigner = {
+export type JwtSigner = {
   sign: (payload: Record<string, unknown>) => Promise<string>;
 };
 
@@ -60,7 +60,6 @@ export const authService = {
       throw new unauthorizedError("invalid username or password");
     }
 
-    // Backfill legacy accounts created before owner role assignment was added.
     if (!userData.role) {
       const ownedOrganization = await authRepository.findOrganizationByOwnerId(
         userData.id,
