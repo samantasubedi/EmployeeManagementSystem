@@ -1,6 +1,7 @@
 import { forbiddenError, unauthorizedError } from "../../error";
 import { authRepository } from "../auth/auth.repository";
 import { createAuthTokens, JwtSigner } from "../auth/auth.service";
+import { superadminRepository } from "./superadmin.repository";
 
 export const superadminService = {
   login: async ({
@@ -34,7 +35,9 @@ export const superadminService = {
     refreshToken:tokens.refreshToken
   }
   },
-  
 
-  
+  getOrganizationInfo: async () => {
+    return superadminRepository.getAllOrganizations();
+  },
 };
+

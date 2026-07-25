@@ -9,9 +9,9 @@ export const superadminController = {
     })
     return{ result }
   },
-  getOrganziationInfo:async (ctx:any) => {
-
-  
+  getOrganziationInfo: async (ctx: any) => {
+    const organizations = await superadminService.getOrganizationInfo();
+    return { organizations };
   },
   suspendOrganization: () => {},
   reactivateOrganization: () => {},
