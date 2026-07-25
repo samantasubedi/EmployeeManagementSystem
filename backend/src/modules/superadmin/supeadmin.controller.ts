@@ -13,6 +13,11 @@ export const superadminController = {
     const organizations = await superadminService.getOrganizationInfo();
     return { organizations };
   },
-  suspendOrganization: () => {},
+  suspendOrganization: async (ctx: any) => {
+    const result = await superadminService.suspendOrganization(
+      ctx.body.organizationSlug
+    );
+    return { result };
+  },
   reactivateOrganization: () => {},
 };

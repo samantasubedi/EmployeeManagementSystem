@@ -39,5 +39,13 @@ export const superadminService = {
   getOrganizationInfo: async () => {
     return superadminRepository.getAllOrganizations();
   },
+
+  suspendOrganization: async (organizationSlug: string) => {
+    const organization = await superadminRepository.findOrganizationBySlug(organizationSlug);
+    return {
+      message: "Organization suspended successfully",
+      organization,
+    };
+  },
 };
 
